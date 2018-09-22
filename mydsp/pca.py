@@ -8,6 +8,7 @@ import numpy as np
 import scipy.signal as sig
 import matplotlib.pyplot as plt
 from sklearn.decomposition import PCA
+from sklearn.preprocessing import StandardScaler
 
 def genData(N, dim):
     """genData(N, dim) - Return N samples of dim dimensional normal data at random positions
@@ -54,11 +55,10 @@ class PCA(object):
         '''
 
         self.data = data
-        self.N = data.shape[0]
-        self.dimensions = data.shape[1]
-        self.varcovar = np.cov(self.data)
-        pca = PCA(data)
-
+        self.N = np.asarray(data).shape[0]
+        self.dimensions = np.asarray(data).shape[1]
+        self.data_std = sig.detrend(self.data,axis=0)
+        self.varcovar = np.cov(self.data_std)
 
         # You are not required to implement corr_anal == True case
         # but it's pretty easy to do once you have the variance-
@@ -69,16 +69,28 @@ class PCA(object):
         Each column is a PCA direction, with the first column
         contributing most to the overall variance.
         """
+        self.eig_vals, self.eig_vecs = np.linalg.eig(self.varcovar)
+        self.eig_vecs.sort()
 
-        return pca.get_pca_directions()
+        eig_vals_index = np.flip(np.argsort(self.eig_vals))
 
+        eig_vec_sorted = []
+        for i in eig_vals_index:
+            eig_vec_sorted.append(self.eig_vals[eig_vals_index])
+
+        return eig_vec_sorted
              
     def transform(self, data, dim=None):
         """transform(data, dim) - Transform data into PCA space
         To reduce the dimension of the data, specify dim as the remaining 
         number of dimensions. Omitting dim results in using all PCA axes 
         """
-        
+        self.eig_vec = np.transpose(self.get_pca_directions())
+        if(dim == None):
+            return np.dot(self.data, self.get_pca_directions())
+        else:
+            return np.dot(self.data, self.get_pca_directions()[:,dim])
+
         
     def get_component_loadings(self):
         """get_component_loadings()
@@ -86,57 +98,9 @@ class PCA(object):
         of variance from each variable i in the original space that is accounted
         for by the jth principal component
         """
+        pass
 
         
-        
-if __name__ == '__main__':
-    
-    plt.ion()  # Interactive plotting
-
-    # Demonstration of using PCA
-
-    # Generate synthetic data set and plot it
-    (data, mu, Sigma) = genData(500, 3)
-    fig = plt.figure()
-    ax = fig.add_subplot(111, projection='3d')
-    h_data = ax.scatter(data[:, 0], data[:, 1], data[:, 2])
-    ax.set_xlabel('$f_0$')
-    ax.set_ylabel('$f_1$')
-    ax.set_zlabel('$f_2$')
-
-    # Conduct PCA analysis using variance-covariance method
-    pca = PCA(data)
-
-    # Show the PCA directions
-    k = 10  # scale up unit vectors by k
-    v = pca.get_pca_directions()
-    for idx in range(v.shape[1]):
-        ax.quiver(0, 0, 0, k * v[idx, 0], k * v[idx, 1], k * v[idx, 2],
-                  color='xkcd:orange')
-
-    # project onto 2d
-    vc_proj = pca.transform(data, 2)
-    # fig = plt.figure()
-    # ax = fig.add_subplot(111)
-    h_vc_proj = ax.scatter(vc_proj[:, 0], vc_proj[:, 1], color='xkcd:orange')
 
 
-    # repeat w/ autocorrelation analysis
-    pcaR = PCA(data, corr_anal=True)
-
-    w = pcaR.get_pca_directions()
-    for idx in range(v.shape[1]):
-        ax.quiver(0, 0, 0, k * w[idx, 0], k * w[idx, 1], k * w[idx, 2], color='xkcd:lilac')
-
-    # project onto 2d
-    r_proj = pcaR.transform(data, 2)
-    h_r_proj = ax.scatter(r_proj[:, 0], r_proj[:, 1], color='xkcd:lilac')
-
-    # Add legend.  $...$ enables LaTeX-like equation formatting
-    plt.legend([h_data, h_vc_proj, h_r_proj],
-               ['Original data', '$\Sigma $projection', '$R$ projection'])
-    print("Autocorrelation component loadings")
-    print(pcaR.get_component_loadings())
-
-    x = 3  # breakable line so our windows don't go away
     

@@ -10,7 +10,7 @@ from mydsp import multifileaudioframes
 import mydsp.plots as plotSpectrogram
 import mydsp.utils as utils
 from mydsp.dftstream import DFTStream
-import mydsp.pca as pca
+from mydsp.pca import PCA
 
 
 def plot_narrowband_wideband(filename):
@@ -56,17 +56,15 @@ def pca_analysis(corpus_dir):
 
     file_list  = utils.get_corpus(corpus_dir)
 
-    multifile = multifileaudioframes.MultiFileAudioFrames(file_list, 10, 20)
-    dftstream = DFTStream(multifile)
+    time, dft_intensity, freq = plotSpectrogram.spectrogram(file_list,10,20)
 
-    frame_list = []
-    for i in dftstream:
-        frame_list.append(i)
+    pca = PCA(dft_intensity)
 
-    frame_list = scale(np.asarray(frame_list))
-    pca.PCA(frame_list)
+    eigen_values = PCA(dft_intensity).eig_vals
 
+    plt.plot(np.arange(len(eigen_values)), np.cumsum(eigen_values))
 
+    plt.show()
 
 def speech_silence(filename):
     """speech_silence(filename)
