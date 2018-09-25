@@ -11,17 +11,13 @@ def spectrogram(filenames, frame_adv, frame_len):
 
     #Computing time axis
 
-
-
     multifile_frame = []
     for frame in multifiles:
         multifile_frame.append(frame)
 
     dftStream = DFTStream(multifiles)
 
-    frames = len(multifiles.samplefile)
-    tidx = int(len(multifiles.samplefile.data) / multifiles.Fs)
-    time = np.linspace(0, tidx, frames)
+    time = np.arange(len(multifiles.samplefile)) * multifiles.get_frameadv_ms() * 0.001
 
     dft_intensity = []
     for frame in dftStream:

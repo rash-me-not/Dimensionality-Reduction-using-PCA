@@ -5,12 +5,10 @@ Name:
 
 import matplotlib.pyplot as plt
 import numpy as np
-from sklearn.preprocessing import scale
-from mydsp import multifileaudioframes
 import mydsp.plots as plotSpectrogram
 import mydsp.utils as utils
-from mydsp.dftstream import DFTStream
 from mydsp.pca import PCA
+import os
 
 
 def plot_narrowband_wideband(filename):
@@ -60,11 +58,38 @@ def pca_analysis(corpus_dir):
 
     pca = PCA(dft_intensity)
 
-    eigen_values = PCA(dft_intensity).eig_vals
+    eigen_values = pca.eig_vals
 
-    plt.plot(np.arange(len(eigen_values)), np.cumsum(eigen_values))
+    variance_captured = 100 * np.cumsum(eigen_values)/sum(eigen_values)
+    plt.plot(np.arange(len(eigen_values)), variance_captured)
 
+    plt.xlabel("Components")
+    plt.ylabel("% of Variance captured")
     plt.show()
+
+    filename = os.path.join(corpus_dir,"ac/6a.wav").replace("\\","/")
+    time_6a, dft_intensity_6a, freq_6a = plotSpectrogram.spectrogram([filename], 10, 20)
+    plt.figure()
+
+
+    decile = 10
+    for counter, value in enumerate(variance_captured):
+
+        while value >= decile:
+            print("{} components required for >={}% ".format(counter+1,decile))
+
+            decile = decile + 10
+
+
+    pca_6a = PCA(dft_intensity_6a)
+    eigen_values_6a = pca_6a.eig_vals
+    variance_captured_6a = 100 * np.cumsum(eigen_values_6a)/sum(eigen_values_6a)
+    min_variance_captured_6a = min(variance_captured)
+    plt.pcolormesh(time_6a, pca_6a, np.asarray(dft_intensity_6a).transpose())
+    plt.xlabel("Time (in sec)")
+    plt.ylabel("Frequency (in Hz)")
+    plt.show()
+
 
 def speech_silence(filename):
     """speech_silence(filename)
@@ -79,5 +104,8 @@ def speech_silence(filename):
 if __name__ == '__main__':
     """If invoked as the main module, e.g. python driver.py, execute
     """
+
     pca_analysis("./ti-digits-train-women/woman")
+
+
 

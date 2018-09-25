@@ -6,9 +6,6 @@ Created on Sep 6, 2017
 
 import numpy as np
 import scipy.signal as sig
-import matplotlib.pyplot as plt
-from sklearn.decomposition import PCA
-from sklearn.preprocessing import StandardScaler
 
 def genData(N, dim):
     """genData(N, dim) - Return N samples of dim dimensional normal data at random positions
@@ -58,17 +55,8 @@ class PCA(object):
         self.N = np.asarray(data).shape[0]
         self.dimensions = np.asarray(data).shape[1]
         self.data_std = sig.detrend(self.data,axis=0)
-        self.varcovar = np.cov(self.data_std)
+        self.varcovar = np.cov(self.data_std, rowvar = False)
 
-        # You are not required to implement corr_anal == True case
-        # but it's pretty easy to do once you have the variance-
-        # covariance case done
-        
-    def get_pca_directions(self):
-        """get_pca_directions() - Return matrix of PCA directions
-        Each column is a PCA direction, with the first column
-        contributing most to the overall variance.
-        """
         self.eig_vals, self.eig_vecs = np.linalg.eig(self.varcovar)
         self.eig_vecs.sort()
 
@@ -78,7 +66,17 @@ class PCA(object):
         for i in eig_vals_index:
             eig_vec_sorted.append(self.eig_vals[eig_vals_index])
 
-        return eig_vec_sorted
+        self.eig_vecs = eig_vec_sorted
+        # You are not required to implement corr_anal == True case
+        # but it's pretty easy to do once you have the variance-
+        # covariance case done
+        
+    def get_pca_directions(self):
+        """get_pca_directions() - Return matrix of PCA directions
+        Each column is a PCA direction, with the first column
+        contributing most to the overall variance.
+        """
+        return self.eig_vecs
              
     def transform(self, data, dim=None):
         """transform(data, dim) - Transform data into PCA space
@@ -91,7 +89,8 @@ class PCA(object):
         else:
             return np.dot(self.data, self.get_pca_directions()[:,dim])
 
-        
+
+    #TODO
     def get_component_loadings(self):
         """get_component_loadings()
         Return a square matrix of component loadings. Column j shows the amount
