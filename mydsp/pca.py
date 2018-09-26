@@ -3,6 +3,7 @@ Created on Sep 6, 2017
 
 @author: mroch
 '''
+import scipy
 
 import numpy as np
 import scipy.signal as sig
@@ -57,8 +58,7 @@ class PCA(object):
         self.data_std = sig.detrend(self.data,axis=0)
         self.varcovar = np.cov(self.data_std, rowvar = False)
 
-        self.eig_vals, self.eig_vecs = np.linalg.eig(self.varcovar)
-        self.eig_vecs.sort()
+        self.eig_vals, self.eig_vecs = scipy.linalg.eig(self.varcovar)
 
         eig_vals_index = np.flip(np.argsort(self.eig_vals))
 
@@ -84,10 +84,11 @@ class PCA(object):
         number of dimensions. Omitting dim results in using all PCA axes 
         """
         self.eig_vec = np.transpose(self.get_pca_directions())
-        if(dim == None):
-            return np.dot(self.data, self.get_pca_directions())
+        if dim is None:
+            return np.dot(self.data, np.asarray(self.get_pca_directions()))
         else:
-            return np.dot(self.data, self.get_pca_directions()[:,dim])
+            # TODO Put np.asarray in get_pca_directions()
+            return np.dot(self.data, np.asarray(self.get_pca_directions())[:, 0:dim])
 
 
     #TODO
@@ -97,7 +98,9 @@ class PCA(object):
         of variance from each variable i in the original space that is accounted
         for by the jth principal component
         """
-        pass
+        return np.divide(
+            np.dot(np.asarray(self.eig_vecs), np.asarray(np.sqrt(self.eig_vals))),
+            self.data_std)
 
         
 

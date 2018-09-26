@@ -25,6 +25,6 @@ def spectrogram(filenames, frame_adv, frame_len):
 
     freq = dftStream.get_Hz()
 
-    return  time, dft_intensity,freq
+    return  [dft_intensity,time,freq]
 
 

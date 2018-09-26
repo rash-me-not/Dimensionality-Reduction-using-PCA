@@ -54,7 +54,7 @@ def pca_analysis(corpus_dir):
 
     file_list  = utils.get_corpus(corpus_dir)
 
-    time, dft_intensity, freq = plotSpectrogram.spectrogram(file_list,10,20)
+    dft_intensity, time, freq = plotSpectrogram.spectrogram(file_list,10,20)
 
     pca = PCA(dft_intensity)
 
@@ -67,11 +67,6 @@ def pca_analysis(corpus_dir):
     plt.ylabel("% of Variance captured")
     plt.show()
 
-    filename = os.path.join(corpus_dir,"ac/6a.wav").replace("\\","/")
-    time_6a, dft_intensity_6a, freq_6a = plotSpectrogram.spectrogram([filename], 10, 20)
-    plt.figure()
-
-
     decile = 10
     for counter, value in enumerate(variance_captured):
 
@@ -80,14 +75,30 @@ def pca_analysis(corpus_dir):
 
             decile = decile + 10
 
+    filename = os.path.join(corpus_dir,"ac/6a.wav").replace("\\","/")
+    dft_intensity_6a, time_6a, freq_6a = plotSpectrogram.spectrogram([filename], 10, 20)
 
     pca_6a = PCA(dft_intensity_6a)
     eigen_values_6a = pca_6a.eig_vals
-    variance_captured_6a = 100 * np.cumsum(eigen_values_6a)/sum(eigen_values_6a)
-    min_variance_captured_6a = min(variance_captured)
-    plt.pcolormesh(time_6a, pca_6a, np.asarray(dft_intensity_6a).transpose())
+
+    #define the threshold to capture number of elements in the data
+    threshold = 80
+    threshold_eig_val_6a = []
+    sum_cumulative=0
+    for i in range(len(eigen_values_6a)):
+        sum_cumulative = sum_cumulative + np.sum(eigen_values_6a[i])
+        if (sum_cumulative/sum(eigen_values_6a))*100 <= threshold:
+            threshold_eig_val_6a.append(eigen_values_6a[i])
+        else:
+            break;
+
+    #todo
+    eigen_vec_6a = pca_6a.transform(dft_intensity_6a,1)
+
+    plt.figure()
+    plt.pcolormesh(np.transpose(np.abs(eigen_vec_6a)))
     plt.xlabel("Time (in sec)")
-    plt.ylabel("Frequency (in Hz)")
+    plt.ylabel("PCA Component")
     plt.show()
 
 
