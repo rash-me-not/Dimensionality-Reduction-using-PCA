@@ -92,11 +92,11 @@ def pca_analysis(corpus_dir):
         else:
             break;
 
-    #todo
-    eigen_vec_6a = pca_6a.transform(dft_intensity_6a,1)
+    dimensions = len(threshold_eig_val_6a)
+    eigen_vec_6a = pca_6a.transform(dft_intensity_6a,dimensions)
 
     plt.figure()
-    plt.pcolormesh(np.transpose(np.abs(eigen_vec_6a)))
+    plt.pcolormesh(time_6a,np.arange(0,dimensions+1),(np.transpose(np.abs(eigen_vec_6a))))
     plt.xlabel("Time (in sec)")
     plt.ylabel("PCA Component")
     plt.show()

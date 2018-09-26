@@ -90,8 +90,6 @@ class PCA(object):
             # TODO Put np.asarray in get_pca_directions()
             return np.dot(self.data, np.asarray(self.get_pca_directions())[:, 0:dim])
 
-
-    #TODO
     def get_component_loadings(self):
         """get_component_loadings()
         Return a square matrix of component loadings. Column j shows the amount
