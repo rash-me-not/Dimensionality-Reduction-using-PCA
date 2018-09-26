@@ -17,34 +17,7 @@ def plot_narrowband_wideband(filename):
     spectrograms of the speech.
     """
 
-    #Computing time to plot on x-axis
-
-    plt.figure()
-    plt.subplot(2,1,1)
-    time , intensity_narrow,freq = plotSpectrogram.spectrogram([filename], 20, 40)
-    plt.annotate('Narrowband spectrogram has poor time resolution', xy=(1.55, 1000), xycoords='data',
-                xytext=(0.8, 0.95), color='yellow', textcoords='axes fraction',
-                arrowprops=dict(facecolor='white', shrink=0.05),
-                horizontalalignment='right', verticalalignment='top',
-                )
-    plt.title("Narrowband Spectrogram (Frame length = 40 sec)")
-    plt.xlabel("Time (in sec)")
-    plt.ylabel("Frequency (in Hz)")
-    plt.pcolormesh(time,freq,np.asarray(intensity_narrow).transpose())
-
-    plt.subplot(2,1,2)
-    time , intensity_wide,freq = plotSpectrogram.spectrogram([filename], 3, 6)
-    plt.annotate('Wideband spectrogram has better time resolution', xy=(1.55, 1000), xycoords='data',
-                xytext=(0.8, 0.95), color='yellow', textcoords='axes fraction',
-                arrowprops=dict(facecolor='white', shrink=0.05),
-                horizontalalignment='right', verticalalignment='top',
-                )
-    plt.pcolormesh(time,freq,np.asarray(intensity_wide).transpose())
-    plt.title("Wideband Spectrogram (Frame length = 6 sec)")
-    plt.xlabel("Time (in sec)")
-    plt.ylabel("Frequency (in Hz)")
-    plt.tight_layout()
-    plt.show()
+    pass
 
 def pca_analysis(corpus_dir):
     """pca_analysis(corpus_dir)
@@ -54,19 +27,22 @@ def pca_analysis(corpus_dir):
 
     file_list  = utils.get_corpus(corpus_dir)
 
+    #get the spectrogram details for all files within "./ti-digits-train-women/woman" and apply PCA on it
     dft_intensity, time, freq = plotSpectrogram.spectrogram(file_list,10,20)
 
     pca = PCA(dft_intensity)
 
-    eigen_values = pca.eig_vals
+    eigen_values = pca.get_eig_vals()
 
     variance_captured = 100 * np.cumsum(eigen_values)/sum(eigen_values)
-    plt.plot(np.arange(len(eigen_values)), variance_captured)
 
+    # plot for number of PCA components versus the amount of variance captured.
+    plt.plot(np.arange(len(eigen_values)), variance_captured)
     plt.xlabel("Components")
     plt.ylabel("% of Variance captured")
     plt.show()
 
+    #summary of the number of components needed for each decile of the variance
     decile = 10
     for counter, value in enumerate(variance_captured):
 
@@ -75,6 +51,7 @@ def pca_analysis(corpus_dir):
 
             decile = decile + 10
 
+    #Get the spectrogram details for audio "ac/6a.wav" and plot it with the PCA components
     filename = os.path.join(corpus_dir,"ac/6a.wav").replace("\\","/")
     dft_intensity_6a, time_6a, freq_6a = plotSpectrogram.spectrogram([filename], 10, 20)
 

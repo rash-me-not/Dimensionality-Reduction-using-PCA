@@ -77,6 +77,11 @@ class PCA(object):
         contributing most to the overall variance.
         """
         return self.eig_vecs
+
+    def get_eig_vals(self):
+        '''get_eig_vals(): Return a matrix with eigen values'''
+
+        return self.eig_vals
              
     def transform(self, data, dim=None):
         """transform(data, dim) - Transform data into PCA space
@@ -87,7 +92,6 @@ class PCA(object):
         if dim is None:
             return np.dot(self.data, np.asarray(self.get_pca_directions()))
         else:
-            # TODO Put np.asarray in get_pca_directions()
             return np.dot(self.data, np.asarray(self.get_pca_directions())[:, 0:dim])
 
     def get_component_loadings(self):
