@@ -40,7 +40,7 @@ def pca_analysis(corpus_dir):
     # plot for number of PCA components versus the amount of variance captured.
     plt.plot(np.arange(len(eigen_values)), variance_captured)
     plt.title(
-        "Plot for number of PCA components versus the amount of variance captured for all files in ./ti-digits-train-women/woman ")
+        "Plot for number of PCA components versus the amount of \nvariance captured for all files in ./ti-digits-train-women/woman ")
     plt.xlabel("Components")
     plt.ylabel("% of Variance captured")
     plt.show()
