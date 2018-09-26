@@ -4,7 +4,6 @@ Created on Sep 6, 2017
 @author: mroch
 '''
 import scipy
-
 import numpy as np
 import scipy.signal as sig
 
