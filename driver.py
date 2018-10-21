@@ -7,17 +7,10 @@ import matplotlib.pyplot as plt
 import numpy as np
 import mydsp.plots as plotSpectrogram
 import mydsp.utils as utils
+from mydsp import audioframes, rmsstream
 from mydsp.pca import PCA
+from sklearn.mixture import GaussianMixture as gaussian
 import os
-
-
-def plot_narrowband_wideband(filename):
-    """plot_narrowband_widband(filename)
-    Given a speech file, display narrowband and wideband
-    spectrograms of the speech.
-    """
-
-    pass
 
 
 def pca_analysis(corpus_dir):
@@ -86,13 +79,6 @@ def pca_analysis(corpus_dir):
     plt.show()
 
 
-def speech_silence(filename):
-    """speech_silence(filename)
-    Given speech file filename, train a 2 mixture GMM on the
-    RMS intensity and label each frame as speech or silence.
-    Provides a plot of results.
-    """
-    pass
 
 
 if __name__ == '__main__':
@@ -100,3 +86,4 @@ if __name__ == '__main__':
     """
 
     pca_analysis("./ti-digits-train-women/woman")
+
